@@ -1,500 +1,276 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>致我永远的女神</title>
-    <style>
-        /* ========== 所有样式保持不变，完全同上一个版本 ========== */
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
-            background: linear-gradient(170deg, #fff8f0 0%, #fce4d6 40%, #f8c8b0 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        .static-flowers {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 2;
-        }
-        .deco-flower {
-            position: absolute;
-            font-size: 2.5rem;
-            opacity: 0.8;
-            animation: gentleSway 4s ease-in-out infinite;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
-        }
-        @keyframes gentleSway {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-8px) rotate(3deg); }
-        }
-        .card {
-            position: relative;
-            z-index: 10;
-            background: rgba(255, 245, 240, 0.55);
-            backdrop-filter: blur(18px) saturate(150%);
-            -webkit-backdrop-filter: blur(18px) saturate(150%);
-            border-radius: 40px;
-            padding: 35px 25px 25px;
-            box-shadow: 0 25px 45px rgba(180, 120, 80, 0.2), 
-                        0 0 0 1px rgba(255, 255, 255, 0.6) inset,
-                        0 1px 0 rgba(255, 255, 255, 0.5) inset;
-            text-align: center;
-            max-width: 340px;
-            width: 85%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: transform 0.3s ease;
-        }
-        .avatar-container {
-            position: relative;
-            width: 130px;
-            height: 130px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #ffb7a5 0%, #ffd5c2 50%, #ffe4d6 100%);
-            padding: 4px;
-            box-shadow: 0 15px 30px rgba(255, 140, 100, 0.35);
-            margin-bottom: 25px;
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
-        .avatar-container:active { transform: scale(0.95); }
-        .avatar-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #fce4d6;
-            transition: opacity 0.4s ease;
-        }
-        .avatar-hint {
-            position: absolute;
-            bottom: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(200, 120, 80, 0.7);
-            backdrop-filter: blur(5px);
-            color: white;
-            font-size: 0.6rem;
-            padding: 3px 12px;
-            border-radius: 20px;
-            white-space: nowrap;
-            opacity: 0.9;
-        }
-        .title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #b85c3a;
-            margin-bottom: 5px;
-            letter-spacing: 2px;
-            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
-        }
-        .subtitle {
-            font-size: 0.8rem;
-            color: #c88a6e;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-        #messageBox {
-            min-height: 55px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            color: #5c3a2e;
-            margin: 10px 0 20px;
-            padding: 0 15px;
-            font-weight: 400;
-            line-height: 1.5;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.7);
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            position: relative;
-        }
-        .text-particle {
-            position: absolute;
-            pointer-events: none;
-            animation: floatUp 1s forwards;
-            color: #e08e6e;
-            font-weight: bold;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-40px) scale(0.5) rotate(20deg); }
-        }
-        .btn-message {
-            background: rgba(255, 215, 195, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            color: #b85c3a;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-            margin: 8px 0 5px;
-            outline: none;
-            box-shadow: 0 8px 20px rgba(200, 120, 80, 0.15);
-        }
-        .btn-message:active {
-            transform: scale(0.94);
-            background: rgba(255, 200, 170, 0.8);
-            box-shadow: 0 4px 10px rgba(200, 120, 80, 0.2);
-        }
-        .music-toggle {
-            margin-top: 18px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #b87a5e;
-            font-size: 0.75rem;
-            cursor: pointer;
-            padding: 8px 18px;
-            border-radius: 30px;
-            background: rgba(255, 235, 220, 0.6);
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.7);
-        }
-        .music-toggle.playing {
-            background: rgba(255, 180, 140, 0.4);
-            border-color: rgba(255, 140, 100, 0.6);
-            color: #b85c3a;
-        }
-        .music-icon {
-            font-size: 1.1rem;
-            transition: transform 0.3s;
-        }
-        .playing .music-icon {
-            animation: wobble 0.8s infinite;
-        }
-        @keyframes wobble {
-            0%,100% { transform: rotate(0deg); }
-            25% { transform: rotate(10deg); }
-            75% { transform: rotate(-10deg); }
-        }
-        .loading-indicator {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #b85c3a;
-            font-size: 0.8rem;
-            background: rgba(255, 245, 240, 0.8);
-            padding: 5px 15px;
-            border-radius: 20px;
-            z-index: 20;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-    </style>
-</head>
-<body>
+<script>
+    // ==================== 配置区 ====================
+    const messages = [
+        "妈，我学会做菜了，是你当年的味道。",
+        "谢谢你总是把最好的给我。",
+        "其实你是我心里最美的女人。",
+        "别再省钱了，护肤品我包了。",
+        "对不起，那次对你发脾气。",
+        "你穿那件蓝裙子真好看。",
+        "妈妈，你是我的第一个朋友。",
+        "希望有一天能成为你的骄傲。",
+        "少看点手机，对眼睛不好。",
+        "下次回家，我给你染头发。",
+        "我爱你，就像你爱我一样。"
+    ];
 
-    <canvas id="bgCanvas"></canvas>
+    const avatarDescription = 
+        "A gentle Chinese mother, warm smile, short soft hair, " +
+        "wearing a cozy cream cardigan, garden background with soft sunlight, " +
+        "anime portrait style, studio ghibli inspired, pastel warm colors, motherly love";
     
-    <div class="static-flowers">
-        <span class="deco-flower" style="top: 8%; left: 5%; font-size: 2.2rem; animation-delay: 0s;">🌸</span>
-        <span class="deco-flower" style="top: 15%; right: 8%; font-size: 2.8rem; animation-delay: 0.8s;">🌺</span>
-        <span class="deco-flower" style="bottom: 12%; left: 10%; font-size: 3rem; animation-delay: 1.6s;">🌼</span>
-        <span class="deco-flower" style="bottom: 20%; right: 5%; font-size: 2rem; animation-delay: 2.4s;">💐</span>
-        <span class="deco-flower" style="top: 45%; left: 3%; font-size: 1.8rem; animation-delay: 0.4s;">🌷</span>
-        <span class="deco-flower" style="top: 60%; right: 4%; font-size: 2.5rem; animation-delay: 1.2s;">🌻</span>
-    </div>
+    const altDescriptions = [
+        "Beautiful Chinese mother, kind eyes, silver hair, floral dress, " +
+        "watercolor anime style, soft pastel, gentle theme, sunny garden",
+        "Happy mother holding flowers, short black hair, sweater, cute elegant, warm, rose garden",
+        "Elegant mother, pearl earrings, white blouse, semi-realistic anime, golden hour, dignified smile"
+    ];
 
-    <div id="loadingIndicator" class="loading-indicator">✨ 绘制女神中...</div>
+    // ==================== 八音盒音乐引擎（Web Audio） ====================
+    let audioCtx = null;
+    let musicPlaying = false;
+    let musicInterval = null;
+    let gainNode = null;
 
-    <div class="card">
-        <div class="avatar-container" id="avatarContainer">
-            <img id="avatarImg" class="avatar-img" src="" alt="妈妈动漫形象">
-            <span class="avatar-hint">✨ 点我换形象</span>
-        </div>
-        <div class="title">致·女神</div>
-        <div class="subtitle">Happy Mother's Day</div>
-        <div id="messageBox">点击花瓣，听我想说的话。</div>
-        <button class="btn-message" id="changeMessageBtn">💮 换一句心里话</button>
-        <div class="music-toggle" id="musicToggle">
-            <span class="music-icon">🎵</span>
-            <span id="musicText">打开八音盒</span>
-        </div>
-    </div>
+    // 小星星旋律的音符频率（C大调）
+    const melody = [
+        523.25, 523.25, 783.99, 783.99, 880.00, 880.00, 783.99, // 一闪一闪亮晶晶
+        698.46, 698.46, 659.25, 659.25, 587.33, 587.33, 523.25, // 满天都是小星星
+        783.99, 783.99, 698.46, 698.46, 659.25, 659.25, 587.33, // 挂在天空放光明
+        783.99, 783.99, 698.46, 698.46, 659.25, 659.25, 587.33, // 好像许多小眼睛
+        523.25, 523.25, 783.99, 783.99, 880.00, 880.00, 783.99, // 一闪一闪亮晶晶
+        698.46, 698.46, 659.25, 659.25, 587.33, 587.33, 523.25  // 满天都是小星星
+    ];
 
-    <script>
-        // ==================== 配置区 ====================
-        const messages = [
-            "妈，我学会做菜了，是你当年的味道。",
-            "谢谢你总是把最好的给我。",
-            "其实你是我心里最美的女人。",
-            "别再省钱了，护肤品我包了。",
-            "对不起，那次对你发脾气。",
-            "你穿那件蓝裙子真好看。",
-            "妈妈，你是我的第一个朋友。",
-            "希望有一天能成为你的骄傲。",
-            "少看点手机，对眼睛不好。",
-            "下次回家，我给你染头发。",
-            "我爱你，就像你爱我一样。"
-        ];
+    // 每个音符的时长（秒）
+    const noteDuration = 0.25;
+    // 音符间隔
+    const noteGap = 0.05;
 
-        const avatarDescription = 
-            "A gentle Chinese mother, warm smile, short soft hair, " +
-            "wearing a cozy cream cardigan, garden background with soft sunlight, " +
-            "anime portrait style, studio ghibli inspired, pastel warm colors, motherly love";
+    function playNote(frequency, startTime, duration) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const noteGain = audioCtx.createGain();
         
-        const altDescriptions = [
-            "Beautiful Chinese mother, kind eyes, silver hair, floral dress, " +
-            "watercolor anime style, soft pastel, gentle smile, mother's day, sunny garden",
-            
-            "Happy mother holding flowers, short black hair, lavender sweater, " +
-            "anime chibi style, cute and elegant, warm sunlight, rose garden background",
-            
-            "Elegant asian mother, pearl earrings, simple white blouse, " +
-            "semi-realistic anime, cherry blossom petals, soft golden hour lighting, dignified smile"
-        ];
+        osc.type = 'sine'; // 正弦波，最接近八音盒
+        osc.frequency.setValueAtTime(frequency, startTime);
+        
+        // 清脆的包络：快速起音，逐渐衰减，模拟敲击
+        noteGain.gain.setValueAtTime(0, startTime);
+        noteGain.gain.linearRampToValueAtTime(0.6, startTime + 0.02);  // 起音
+        noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + duration); // 衰减
+        
+        osc.connect(noteGain);
+        noteGain.connect(gainNode); // 连接到总音量控制
+        
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.05);
+    }
 
-        // ==================== 内嵌音乐（Base64） ====================
-        // 这是一段轻柔和弦的极简音频，循环播放就像八音盒。
-        // 如果你有自己的音乐文件，可以转成 Base64 替换下面这串。
-        const embeddedMusicBase64 = "SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADkQDIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjI//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAwMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+    function startMusic() {
+        if (musicPlaying) return;
         
-        // ==================== 逻辑代码 ====================
-        const bgCanvas = document.getElementById('bgCanvas');
-        const bgCtx = bgCanvas.getContext('2d');
-        const messageBox = document.getElementById('messageBox');
-        const changeBtn = document.getElementById('changeMessageBtn');
-        const avatarImg = document.getElementById('avatarImg');
-        const avatarContainer = document.getElementById('avatarContainer');
-        const loadingInd = document.getElementById('loadingIndicator');
-        const musicToggle = document.getElementById('musicToggle');
-        const musicText = document.getElementById('musicText');
-        
-        let particles = [];
-        const PARTICLE_COUNT = 70;
-        
-        function resizeBgCanvas() {
-            bgCanvas.width = window.innerWidth;
-            bgCanvas.height = window.innerHeight;
+        // 初始化音频上下文（必须在用户手势中）
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            gainNode = audioCtx.createGain();
+            gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gainNode.connect(audioCtx.destination);
         }
-        window.addEventListener('resize', resizeBgCanvas);
-        resizeBgCanvas();
         
-        class Particle {
-            constructor() {
-                this.reset(true);
+        // 恢复被挂起的上下文（某些浏览器需要）
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        
+        musicPlaying = true;
+        let noteIndex = 0;
+        const totalNotes = melody.length;
+        
+        // 用定时器循环播放旋律
+        musicInterval = setInterval(() => {
+            if (!musicPlaying) {
+                clearInterval(musicInterval);
+                return;
             }
-            reset(fromTop = false) {
-                this.x = Math.random() * bgCanvas.width;
-                this.y = fromTop ? -30 : Math.random() * bgCanvas.height;
-                this.type = Math.random() > 0.5 ? 'petal' : 'bokeh';
-                this.size = this.type === 'petal' ? Math.random() * 20 + 10 : Math.random() * 8 + 3;
-                this.speedY = Math.random() * 1.0 + 0.3;
-                this.speedX = Math.random() * 0.5 - 0.25;
-                this.rotation = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.015;
-                this.opacity = Math.random() * 0.6 + 0.4;
-                const colors = [
-                    '#ffd5c2', '#ffe4d6', '#ffc1a1', '#ffb7a5',
-                    '#fff0e6', '#ffe0cc', '#ffd9b3', '#fff5ec',
-                    '#ffc8a2', '#f8d5b0', '#ffe8d6'
-                ];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-            update() {
-                this.y += this.speedY;
-                this.x += this.speedX + Math.sin(this.y * 0.01) * 0.3;
-                this.rotation += this.rotSpeed;
-                if (this.y > bgCanvas.height + 50 || this.x < -50 || this.x > bgCanvas.width + 50) {
-                    this.reset(true);
-                }
-            }
-            draw(ctx) {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.rotation);
-                ctx.globalAlpha = this.opacity;
-                if (this.type === 'petal') {
-                    ctx.fillStyle = this.color;
-                    for (let i = 0; i < 5; i++) {
-                        ctx.rotate(Math.PI * 2 / 5);
-                        ctx.beginPath();
-                        ctx.ellipse(0, this.size * 0.4, this.size * 0.25, this.size * 0.5, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                    ctx.fillStyle = '#fff3e0';
+            const now = audioCtx.currentTime;
+            const freq = melody[noteIndex % totalNotes];
+            playNote(freq, now, noteDuration);
+            noteIndex++;
+        }, (noteDuration + noteGap) * 1000);
+    }
+
+    function stopMusic() {
+        musicPlaying = false;
+        if (musicInterval) {
+            clearInterval(musicInterval);
+            musicInterval = null;
+        }
+        // 不关闭 AudioContext，以便下次播放
+    }
+
+    // ==================== 其他功能代码 ====================
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    const messageBox = document.getElementById('messageBox');
+    const changeBtn = document.getElementById('changeMessageBtn');
+    const avatarImg = document.getElementById('avatarImg');
+    const avatarContainer = document.getElementById('avatarContainer');
+    const loadingInd = document.getElementById('loadingIndicator');
+    const musicToggle = document.getElementById('musicToggle');
+    const musicText = document.getElementById('musicText');
+    
+    let particles = [];
+    const PARTICLE_COUNT = 70;
+    
+    function resizeBgCanvas() {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeBgCanvas);
+    resizeBgCanvas();
+    
+    class Particle {
+        constructor() { this.reset(true); }
+        reset(fromTop = false) {
+            this.x = Math.random() * bgCanvas.width;
+            this.y = fromTop ? -30 : Math.random() * bgCanvas.height;
+            this.type = Math.random() > 0.5 ? 'petal' : 'bokeh';
+            this.size = this.type === 'petal' ? Math.random() * 20 + 10 : Math.random() * 8 + 3;
+            this.speedY = Math.random() * 1.0 + 0.3;
+            this.speedX = Math.random() * 0.5 - 0.25;
+            this.rotation = Math.random() * Math.PI * 2;
+            this.rotSpeed = (Math.random() - 0.5) * 0.015;
+            this.opacity = Math.random() * 0.6 + 0.4;
+            const colors = ['#ffd5c2','#ffe4d6','#ffc1a1','#ffb7a5','#fff0e6','#ffe0cc','#ffd9b3','#fff5ec','#ffc8a2','#f8d5b0','#ffe8d6'];
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+        }
+        update() {
+            this.y += this.speedY;
+            this.x += this.speedX + Math.sin(this.y * 0.01) * 0.3;
+            this.rotation += this.rotSpeed;
+            if (this.y > bgCanvas.height + 50 || this.x < -50 || this.x > bgCanvas.width + 50) this.reset(true);
+        }
+        draw(ctx) {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.globalAlpha = this.opacity;
+            if (this.type === 'petal') {
+                ctx.fillStyle = this.color;
+                for (let i = 0; i < 5; i++) {
+                    ctx.rotate(Math.PI*2/5);
                     ctx.beginPath();
-                    ctx.arc(0, 0, this.size * 0.2, 0, Math.PI * 2);
-                    ctx.fill();
-                } else {
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                    ctx.beginPath();
-                    ctx.arc(-this.size*0.25, -this.size*0.25, this.size*0.4, 0, Math.PI*2);
+                    ctx.ellipse(0, this.size*0.4, this.size*0.25, this.size*0.5, 0, 0, Math.PI*2);
                     ctx.fill();
                 }
-                ctx.restore();
-            }
-        }
-        
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < PARTICLE_COUNT; i++) {
-                particles.push(new Particle());
-            }
-        }
-        initParticles();
-        
-        function animateBg() {
-            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-            for (let p of particles) {
-                p.update();
-                p.draw(bgCtx);
-            }
-            requestAnimationFrame(animateBg);
-        }
-        animateBg();
-        
-        function createTextParticles(text) {
-            const chars = text.split('');
-            chars.forEach((char, i) => {
-                const span = document.createElement('span');
-                span.className = 'text-particle';
-                span.textContent = char;
-                span.style.left = `${Math.random() * 80 + 10}%`;
-                span.style.animationDelay = `${i * 0.03}s`;
-                messageBox.appendChild(span);
-                setTimeout(() => span.remove(), 1000);
-            });
-        }
-        
-        function showRandomMessage() {
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * messages.length);
-            } while (messages.length > 1 && messageBox.innerText === messages[randomIndex]);
-            
-            const newMessage = messages[randomIndex];
-            if (messageBox.innerText !== newMessage) {
-                createTextParticles(newMessage);
-            }
-            messageBox.style.opacity = '0';
-            messageBox.style.transform = 'translateY(10px)';
-            setTimeout(() => {
-                messageBox.innerText = newMessage;
-                messageBox.style.opacity = '1';
-                messageBox.style.transform = 'translateY(0)';
-            }, 200);
-        }
-        
-        changeBtn.addEventListener('click', showRandomMessage);
-        
-        let currentAvatarIndex = 0;
-        const allDescriptions = [avatarDescription, ...altDescriptions];
-        
-        async function generateAvatar(description, isInitial = false) {
-            avatarImg.style.opacity = '0.5';
-            if (!isInitial) loadingInd.style.display = 'block';
-            try {
-                const encodedDesc = encodeURIComponent(description);
-                const imageUrl = `https://image.pollinations.ai/prompt/${encodedDesc}?width=512&height=512&nologo=true&seed=${Date.now()}`;
-                const img = new Image();
-                img.crossOrigin = 'anonymous';
-                await new Promise((resolve, reject) => {
-                    img.onload = resolve;
-                    img.onerror = reject;
-                    img.src = imageUrl;
-                    setTimeout(() => reject(new Error('timeout')), 15000);
-                });
-                avatarImg.src = imageUrl;
-                avatarImg.style.opacity = '1';
-            } catch (error) {
-                console.warn('AI生成失败，使用预设动漫头像', error);
-                avatarImg.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23ffd5c2' width='200' height='200' rx='100'/%3E%3Ccircle cx='100' cy='80' r='30' fill='%23fff0e6'/%3E%3Ccircle cx='85' cy='75' r='4' fill='%235c3a2e'/%3E%3Ccircle cx='115' cy='75' r='4' fill='%235c3a2e'/%3E%3Cpath d='M85 95 Q100 110 115 95' stroke='%23b85c3a' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Ctext x='100' y='155' text-anchor='middle' fill='%23b85c3a' font-size='14' font-family='sans-serif'%3E❤️ 妈妈 ❤️%3C/text%3E%3C/svg%3E";
-                avatarImg.style.opacity = '1';
-            } finally {
-                loadingInd.style.display = 'none';
-            }
-        }
-        
-        avatarContainer.addEventListener('click', () => {
-            currentAvatarIndex = (currentAvatarIndex + 1) % allDescriptions.length;
-            generateAvatar(allDescriptions[currentAvatarIndex]);
-        });
-        
-        generateAvatar(avatarDescription, true);
-        
-        // ==================== 修复后的八音盒播放逻辑 ====================
-        let audio = null;
-        let isPlaying = false;
-        
-        function initAudio() {
-            if (audio) return; // 已初始化
-            try {
-                // 1. 将 Base64 字符串解码为二进制
-                const binaryStr = atob(embeddedMusicBase64);
-                const len = binaryStr.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryStr.charCodeAt(i);
-                }
-                // 2. 创建 Blob 并转为本地 URL
-                const blob = new Blob([bytes], { type: 'audio/mp3' });
-                const url = URL.createObjectURL(blob);
-                
-                // 3. 初始化 Audio
-                audio = new Audio(url);
-                audio.loop = true;
-                audio.volume = 0.5;
-            } catch (e) {
-                console.error('音乐解码失败', e);
-                alert('音乐组件初始化失败，但页面其他功能正常～');
-            }
-        }
-        
-        musicToggle.addEventListener('click', () => {
-            initAudio();
-            if (!audio) return;
-            
-            if (isPlaying) {
-                audio.pause();
-                musicToggle.classList.remove('playing');
-                musicText.textContent = '打开八音盒';
-                isPlaying = false;
+                ctx.fillStyle = '#fff3e0';
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size*0.2, 0, Math.PI*2);
+                ctx.fill();
             } else {
-                audio.play().then(() => {
-                    musicToggle.classList.add('playing');
-                    musicText.textContent = '关闭八音盒';
-                    isPlaying = true;
-                }).catch(e => {
-                    console.warn('播放被浏览器拦截，请先点击页面任意位置', e);
-                    alert('请先点击一下页面其他地方，再点打开音乐～');
-                });
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, this.size, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.beginPath();
+                ctx.arc(-this.size*0.25, -this.size*0.25, this.size*0.4, 0, Math.PI*2);
+                ctx.fill();
             }
+            ctx.restore();
+        }
+    }
+    
+    function initParticles() {
+        particles = [];
+        for (let i=0; i<PARTICLE_COUNT; i++) particles.push(new Particle());
+    }
+    initParticles();
+    
+    function animateBg() {
+        bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
+        for (let p of particles) { p.update(); p.draw(bgCtx); }
+        requestAnimationFrame(animateBg);
+    }
+    animateBg();
+    
+    function createTextParticles(text) {
+        const chars = text.split('');
+        chars.forEach((char,i) => {
+            const span = document.createElement('span');
+            span.className = 'text-particle';
+            span.textContent = char;
+            span.style.left = `${Math.random()*80+10}%`;
+            span.style.animationDelay = `${i*0.03}s`;
+            messageBox.appendChild(span);
+            setTimeout(() => span.remove(), 1000);
         });
-        
-        showRandomMessage();
-        console.log('💮 母亲节快乐！音乐已内嵌，不再依赖外部链接。');
-    </script>
-</body>
-</html>
+    }
+    
+    function showRandomMessage() {
+        let randomIndex;
+        do { randomIndex = Math.floor(Math.random()*messages.length); }
+        while (messages.length>1 && messageBox.innerText===messages[randomIndex]);
+        const newMessage = messages[randomIndex];
+        if (messageBox.innerText !== newMessage) createTextParticles(newMessage);
+        messageBox.style.opacity='0';
+        messageBox.style.transform='translateY(10px)';
+        setTimeout(()=>{
+            messageBox.innerText=newMessage;
+            messageBox.style.opacity='1';
+            messageBox.style.transform='translateY(0)';
+        },200);
+    }
+    
+    changeBtn.addEventListener('click', showRandomMessage);
+    
+    let currentAvatarIndex = 0;
+    const allDescriptions = [avatarDescription, ...altDescriptions];
+    
+    async function generateAvatar(description, isInitial=false) {
+        avatarImg.style.opacity='0.5';
+        if(!isInitial) loadingInd.style.display='block';
+        try {
+            const encodedDesc = encodeURIComponent(description);
+            const imageUrl = `https://image.pollinations.ai/prompt/${encodedDesc}?width=512&height=512&nologo=true&seed=${Date.now()}`;
+            const img = new Image();
+            img.crossOrigin='anonymous';
+            await new Promise((resolve,reject) => {
+                img.onload=resolve;
+                img.onerror=reject;
+                img.src=imageUrl;
+                setTimeout(()=>reject(new Error('timeout')),15000);
+            });
+            avatarImg.src=imageUrl;
+            avatarImg.style.opacity='1';
+        } catch(e) {
+            console.warn('AI生成失败',e);
+            avatarImg.src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect fill='%23ffd5c2' width='200' height='200' rx='100'/%3E%3Ccircle cx='100' cy='80' r='30' fill='%23fff0e6'/%3E%3Ccircle cx='85' cy='75' r='4' fill='%235c3a2e'/%3E%3Ccircle cx='115' cy='75' r='4' fill='%235c3a2e'/%3E%3Cpath d='M85 95 Q100 110 115 95' stroke='%23b85c3a' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3Ctext x='100' y='155' text-anchor='middle' fill='%23b85c3a' font-size='14' font-family='sans-serif'%3E❤️ 妈妈 ❤️%3C/text%3E%3C/svg%3E";
+            avatarImg.style.opacity='1';
+        } finally { loadingInd.style.display='none'; }
+    }
+    
+    avatarContainer.addEventListener('click', ()=>{
+        currentAvatarIndex = (currentAvatarIndex+1)%allDescriptions.length;
+        generateAvatar(allDescriptions[currentAvatarIndex]);
+    });
+    
+    generateAvatar(avatarDescription, true);
+    
+    // ==================== 音乐开关控制（绑定新引擎） ====================
+    musicToggle.addEventListener('click', () => {
+        if (musicPlaying) {
+            stopMusic();
+            musicToggle.classList.remove('playing');
+            musicText.textContent = '打开八音盒';
+        } else {
+            startMusic();
+            musicToggle.classList.add('playing');
+            musicText.textContent = '关闭八音盒';
+        }
+    });
+    
+    showRandomMessage();
+    console.log('💮 八音盒已就绪，用代码为你演奏小星星。');
+</script>
